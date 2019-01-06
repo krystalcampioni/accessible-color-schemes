@@ -1,0 +1,13 @@
+.navbar {
+  &__list {
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    text-transform: uppercase;
+
+    li {
+      display: inline;
+      padding: 10px 20px 10px 0px;
+    }
+  }
+}

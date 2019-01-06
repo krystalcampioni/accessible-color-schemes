@@ -1,0 +1,22 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+button {
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+.flex-container {
+  max-width: 960px;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+}

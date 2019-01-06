@@ -1,0 +1,17 @@
+.header {
+  background-color: var(--tertiary-bg-color);
+
+  &__logo {
+    @include vertical-align-flex;
+    width: 170px;
+    padding: 9px 0 6px;
+  }
+
+  &__button {
+    width: 40px;
+  }
+
+  &__actions {
+    align-self: center;
+  }
+}
