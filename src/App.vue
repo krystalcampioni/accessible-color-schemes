@@ -5,29 +5,33 @@
       <router-link to="/about">About</router-link>
     </div> -->
     <HelloWorld :primaryColor="primaryBgColor"></HelloWorld>
-    <input type="color" v-model="primaryBgColor" @change="updateColors">
-    <div class="color-scheme color-scheme--complementary">
-      <h1>{{ primaryContrast }}</h1>
-      <h2 :style="{
-        color: primaryTextColor
-      }">{{ primaryTextColor.color }} </h2>
-      <h2>{{ selectedColorScheme.name }} Colors</h2>
-      <ul>
-        <li v-for="n in 4" :key="n">some text</li>
-      </ul>
-    </div>
+
     <div class="controls">
-      <button
-        v-for="scheme in colorSchemes"
-        @click="selectColorScheme(scheme)"
-        :key="scheme.name"
-        :class="{
-          '-is-selected': selectedColorScheme === scheme
-        }"
-      >
-        {{ scheme.name }}
-      </button>
+      <input type="color" v-model="primaryBgColor" @change="updateColors">
+      <div class="color-scheme color-scheme--complementary">
+        <h1>{{ primaryContrast }}</h1>
+        <h2 :style="{
+          color: primaryTextColor
+        }">{{ primaryTextColor.color }} </h2>
+        <h2>{{ selectedColorScheme.name }} Colors</h2>
+        <ul>
+          <li v-for="n in 4" :key="n">some text</li>
+        </ul>
+      </div>
+      <div class="controls__buttons">
+        <button
+          v-for="scheme in colorSchemes"
+          @click="selectColorScheme(scheme)"
+          :key="scheme.name"
+          :class="{
+            '-is-selected': selectedColorScheme === scheme
+          }"
+        >
+          {{ scheme.name }}
+        </button>
+      </div>
     </div>
+
   </div>
 </template>
 

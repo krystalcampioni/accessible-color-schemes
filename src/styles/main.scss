@@ -60,8 +60,19 @@ p {
 
 
 .controls {
+  flex-direction: column;
+  position: fixed;
+  height: 100%;
+  width: 400px;
+  right: 0;
+  top: 0;
+  z-index: 900;
+  background: gray;
   display: flex;
-  justify-content: space-between;
+
+  &__buttons {
+    flex-direction: row;
+  }
 
   button {
     background: transparent;
