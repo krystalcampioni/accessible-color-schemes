@@ -47,11 +47,13 @@ export default {
   data() {
     return {
       mainColor: "#00fbc8",
-      primary: {
-        text: "",
-        bg: ""
-      },
-      mode: "dark",
+
+      primary: null,
+      secondary: null,
+      tertiary: null,
+      quaternary: null,
+
+      mode: "light",
       colorSchemes: {
         complementary: {
           name: "Complementary",
@@ -80,7 +82,17 @@ export default {
   components: {
     HelloWorld
   },
-  computed: {},
+  computed: {
+    linkColor() {
+      let color = Color(this.quaternary.bg);
+      // If the contrast is not enough with black or white text,
+      // we need to darken/lighten the background color
+      if (color.contrast(Color("#fff")) <= MIN_CONTRAST) {
+        color = color.darken(0.5);
+      }
+      return color;
+    }
+  },
   methods: {
     generateTextAndBg(color) {
       let bg = Color(color);
@@ -138,6 +150,8 @@ export default {
 
       this.updateColorVariable("--quaternary-text-color", this.quaternary.text);
       this.updateColorVariable("--quaternary-bg-color", this.quaternary.bg);
+
+      this.updateColorVariable("--link-color", this.linkColor);
     }
   },
   created() {
