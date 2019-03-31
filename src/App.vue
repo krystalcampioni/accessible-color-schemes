@@ -1,52 +1,77 @@
 <template>
   <div id="app">
-    <HelloWorld :primaryColor="primary.text"></HelloWorld>
+    <StoreApp :primaryColor="primary.text" />
 
-    <div class="controls">
-      <input type="color" v-model="mainColor" @change="updateColors" />
-      <div class="color-scheme color-scheme--complementary">
-        <h2>{{ selectedColorScheme.name }} Colors</h2>
-        <ul>
-          <li v-for="n in 4" :key="n">some text</li>
-        </ul>
-      </div>
+    <form class="controls">
+      <fieldset>
+        <legend>Main color:</legend>
+        <input type="color" v-model="mainColor" @change="updateColors" />
+      </fieldset>
+
       <div class="controls__buttons">
-        <button :class="{
-            '-is-selected': mode === 'dark'
-          }"
-          @click="selectMode('dark')">dark mode</button>
-        <button :class="{
-            '-is-selected': mode === 'light'
-          }"
-          @click="selectMode('light')">light mode</button>
+        <fieldset>
+          <legend>Mode:</legend>
+          <label for="dark">
+            <input
+              v-model="mode"
+              type="radio"
+              name="mode"
+              id="dark"
+              value="dark"
+            />
+            dark
+          </label>
+          <label for="light">
+            <input
+              v-model="mode"
+              type="radio"
+              name="mode"
+              id="light"
+              value="light"
+            />
+            light
+          </label>
+        </fieldset>
 
-        <button
-          v-for="scheme in colorSchemes"
-          @click="selectColorScheme(scheme)"
-          :key="scheme.name"
-          :class="{
-            '-is-selected': selectedColorScheme === scheme
-          }"
-        >
-          {{ scheme.name }}
-        </button>
+        <fieldset>
+          <legend>Color scheme:</legend>
+          <label
+            :for="scheme.name"
+            v-for="scheme in colorSchemes"
+            :key="scheme.name"
+          >
+            <input
+              @click="selectColorScheme(scheme)"
+              type="radio"
+              :id="scheme.name"
+              :value="scheme"
+              v-model="selectedColorScheme"
+            />
+            {{ scheme.name }}
+          </label>
+        </fieldset>
       </div>
-    </div>
 
+      <fieldset class="color-scheme color-scheme--complementary">
+        <legend>Preview:</legend>
+        <ul>
+          <li v-for="n in 4" :key="n"></li>
+        </ul>
+      </fieldset>
+    </form>
   </div>
 </template>
 
 <script>
-const MIN_CONTRAST = 4.5;
 import Color from "color";
-import contrast from "get-contrast";
+import StoreApp from "./components/StoreApp";
 
-import HelloWorld from "./components/HelloWorld";
+const MIN_CONTRAST = 4.5;
 
 export default {
   data() {
     return {
-      mainColor: "#00fbc8",
+      mainColor: "#284d7f",
 
       primary: null,
       secondary: null,
@@ -54,6 +79,7 @@ export default {
       quaternary: null,
 
       mode: "light",
+
       colorSchemes: {
         complementary: {
           name: "Complementary",
@@ -80,55 +106,63 @@ export default {
     };
   },
   components: {
-    HelloWorld
+    StoreApp
   },
   computed: {
     linkColor() {
       let color = Color(this.quaternary.bg);
+      let constrast = color.contrast(Color("#fff"));
+
       // If the contrast is not enough with black or white text,
       // we need to darken/lighten the background color
-      if (color.contrast(Color("#fff")) <= MIN_CONTRAST) {
+      while (constrast < MIN_CONTRAST) {
         color = color.darken(0.5);
+        constrast = color.contrast(Color("#fff"));
       }
       return color;
     }
   },
+
+  watch: {
+    mode() {
+      this.updateColorVariable(
+        "--mode-text-color",
+        this.mode === "dark" ? "#bbbfbd" : "#525458"
+      );
+      this.updateColorVariable(
+        "--mode-bg-color",
+        this.mode === "dark" ? "#1e2125" : "#fff"
+      );
+    }
+  },
+
   methods: {
+    updateColorVariable(colorName, newValue) {
+      document.documentElement.style.setProperty(colorName, newValue);
+    },
+
     generateTextAndBg(color) {
       let bg = Color(color);
-      let text = bg.isLight() ? Color("#000") : Color("#fff");
+      const text = bg.isLight() ? Color("#000") : Color("#fff");
+
+      let constrast = text.contrast(bg);
 
       // If the contrast is not enough with black or white text,
       // we need to darken/lighten the background color
-      if (text.contrast(bg) <= MIN_CONTRAST) {
+      while (constrast < MIN_CONTRAST) {
         bg = text.isLight() ? bg.darken(0.5) : bg.lighten(0.5);
+        constrast = text.contrast(bg);
       }
-
-      return {
-        text: text.string(),
-        bg: bg.string()
-      };
+      return { text: text.string(), bg: bg.string() };
     },
+
     selectColorScheme(scheme) {
       this.selectedColorScheme = scheme;
       this.updateColors();
     },
-    selectMode(mode) {
-      this.mode = mode;
 
-      this.updateColorVariable(
-        "--mode-text-color",
-        this.mode === "dark" ? "white" : "black"
-      );
-      this.updateColorVariable(
-        "--mode-bg-color",
-        this.mode === "dark" ? "black" : "white"
-      );
-    },
-    updateColorVariable(colorName, newValue) {
-      document.documentElement.style.setProperty(colorName, newValue);
-    },
     updateColors() {
+      // Generate colors
       this.primary = this.generateTextAndBg(this.mainColor);
       this.secondary = this.generateTextAndBg(
         Color(this.mainColor).rotate(this.selectedColorScheme.angles[0])
@@ -139,17 +173,14 @@ export default {
       this.quaternary = this.generateTextAndBg(
         Color(this.mainColor).rotate(this.selectedColorScheme.angles[2])
       );
-      this.updateColorVariable("--primary-text-color", this.primary.text);
-      this.updateColorVariable("--primary-bg-color", this.primary.bg);
 
-      this.updateColorVariable("--secondary-text-color", this.secondary.text);
-      this.updateColorVariable("--secondary-bg-color", this.secondary.bg);
+      // Update CSS variables
+      const colorOptions = ["primary", "secondary", "tertiary", "quaternary"];
 
-      this.updateColorVariable("--tertiary-text-color", this.tertiary.text);
-      this.updateColorVariable("--tertiary-bg-color", this.tertiary.bg);
-
-      this.updateColorVariable("--quaternary-text-color", this.quaternary.text);
-      this.updateColorVariable("--quaternary-bg-color", this.quaternary.bg);
+      colorOptions.forEach(option => {
+        this.updateColorVariable(`--${option}-text-color`, this[option].text);
+        this.updateColorVariable(`--${option}-bg-color`, this[option].bg);
+      });
 
       this.updateColorVariable("--link-color", this.linkColor);
     }
@@ -160,7 +191,6 @@ export default {
   }
 };
 </script>
-
 
 <style lang="scss">
 @import "./styles/main.scss";

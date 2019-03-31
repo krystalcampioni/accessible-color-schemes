@@ -1,5 +1,6 @@
 :root {
   --primary-bg-color: coral;
+  --secondary-text-color: coral;
   --secondary-bg-color: coral;
   --tertiary-bg-color: coral;
 
@@ -29,6 +30,11 @@ a {
 }
 p {
   font-family: 'Thasadith', sans-serif;
+}
+
+input[type="color"] {
+  width: 100%;
+  height: 40px;
 }
 
 .color-scheme {
@@ -63,15 +69,37 @@ p {
 
 
 .controls {
+  font-family: 'Thasadith', sans-serif;
   flex-direction: column;
   position: fixed;
   height: 100%;
-  width: 400px;
+  width: 250px;
   right: 0;
   top: 0;
   z-index: 900;
-  background: gray;
+  background: #282828;
+  color: #fff;
   display: flex;
+
+  label {
+    display: block;
+  }
+
+  fieldset {
+    display: block;
+    padding: 20px 15px;
+    border: 1px solid #131618;
+    margin: 10px;
+  }
+
+  legend {
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    padding: 0 10px;
+    text-transform: uppercase;
+    font-size: 20px;
+    letter-spacing: 1px;
+  }
 
   &__buttons {
     flex-direction: row;

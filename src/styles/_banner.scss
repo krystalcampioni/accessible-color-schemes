@@ -1,14 +1,14 @@
 .banner {
-  background: url(/img/backgrounds/background_0.jpg) no-repeat scroll center/cover;
+  background: url(/img/backgrounds/background_11.jpg) no-repeat scroll center/cover;
+  border-bottom: 10px solid var(--secondary-bg-color);
   display: inline-block;
-  height: 40vh;
+  height: calc(100vh - 450px);
   position: relative;
   width: 100%;
   justify-content: flex-end;
   flex-direction: column;
   display: flex;
   pointer-events: none;
-  border-bottom: 10px solid var(--secondary-bg-color);
 
   &__overlay {
     left: 0;
