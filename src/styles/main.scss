@@ -18,8 +18,8 @@
 
 body {
   font-family: 'Oswald', sans-serif;
-  background-color: #282828;
-  color: var(--primary-text-color);
+  background-color: var(--mode-bg-color);
+  color: var(--mode-text-color);
   padding: 0;
   margin: 0;
 }
