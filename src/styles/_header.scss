@@ -1,5 +1,6 @@
 .header {
-  background-color: var(--tertiary-bg-color);
+  background-color: var(--primary-bg-color);
+  color: var(--primary-text-color);
 
   &__logo {
     @include vertical-align-flex;
@@ -9,6 +10,7 @@
 
   &__button {
     width: 40px;
+    padding: 5px;
   }
 
   &__actions {

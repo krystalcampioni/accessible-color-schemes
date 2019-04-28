@@ -1,46 +1,85 @@
 <template>
-  <div id="app" v-if="selectedColorScheme">
-    <!-- <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div> -->
-    <HelloWorld :primaryColor="primaryBgColor"></HelloWorld>
-    <input type="color" v-model="primaryBgColor" @change="updateColors">
-    <div class="color-scheme color-scheme--complementary">
-      <h1>{{ primaryContrast }}</h1>
-      <h2 :style="{
-        color: primaryTextColor
-      }">{{ primaryTextColor.color }} </h2>
-      <h2>{{ selectedColorScheme.name }} Colors</h2>
-      <ul>
-        <li v-for="n in 4" :key="n">some text</li>
-      </ul>
-    </div>
-    <div class="controls">
-      <button
-        v-for="scheme in colorSchemes"
-        @click="selectColorScheme(scheme)"
-        :key="scheme.name"
-        :class="{
-          '-is-selected': selectedColorScheme === scheme
-        }"
-      >
-        {{ scheme.name }}
-      </button>
-    </div>
+  <div id="app">
+    <StoreApp :primaryColor="primary.text" />
+
+    <form class="controls">
+      <fieldset>
+        <legend>Main color:</legend>
+        <input type="color" v-model="mainColor" @change="updateColors" />
+      </fieldset>
+
+      <div class="controls__buttons">
+        <fieldset>
+          <legend>Mode:</legend>
+          <label for="dark">
+            <input
+              v-model="mode"
+              type="radio"
+              name="mode"
+              id="dark"
+              value="dark"
+            />
+            dark
+          </label>
+          <label for="light">
+            <input
+              v-model="mode"
+              type="radio"
+              name="mode"
+              id="light"
+              value="light"
+            />
+            light
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Color scheme:</legend>
+          <label
+            :for="scheme.name"
+            v-for="scheme in colorSchemes"
+            :key="scheme.name"
+          >
+            <input
+              @click="selectColorScheme(scheme)"
+              type="radio"
+              :id="scheme.name"
+              :value="scheme"
+              v-model="selectedColorScheme"
+            />
+            {{ scheme.name }}
+          </label>
+        </fieldset>
+      </div>
+
+      <fieldset class="color-scheme color-scheme--complementary">
+        <legend>Preview:</legend>
+        <ul>
+          <li v-for="n in 4" :key="n"></li>
+        </ul>
+      </fieldset>
+    </form>
   </div>
 </template>
 
 <script>
 import Color from "color";
-import contrast from "get-contrast";
+import StoreApp from "./components/StoreApp";
 
-import HelloWorld from './components/HelloWorld';
+const MIN_CONTRAST = 4.5;
 
 export default {
   data() {
     return {
-      primaryBgColor: "#00fbc8",
+      mainColor: "#284d7f",
+
+      primary: null,
+      secondary: null,
+      tertiary: null,
+      quaternary: null,
+
+      mode: "light",
+
       colorSchemes: {
         complementary: {
           name: "Complementary",
@@ -67,98 +106,92 @@ export default {
     };
   },
   components: {
-    HelloWorld,
+    StoreApp
   },
   computed: {
-    primaryContrast() {
-      const color = Color(this.primaryBgColor);
-      const color2 = Color(this.primaryTextColor);
-      return contrast.score(this.primaryBgColor, this.primaryTextColor);
-    },
-    secondaryBgColor() {
-      const color = Color(this.primaryBgColor);
-      return color.rotate(this.selectedColorScheme.angles[0]);
-    },
-    tertiaryBgColor() {
-      const color = Color(this.primaryBgColor);
-      return color.rotate(this.selectedColorScheme.angles[1]);
-    },
-    quaternaryBgColor() {
-      const color = Color(this.primaryBgColor);
-      return color.rotate(this.selectedColorScheme.angles[2]).string();
-    },
-    primaryTextColor() {
-      const bgColor = Color(this.primaryBgColor);
-      let textColor = Color(this.primaryBgColor);
+    linkColor() {
+      let color = Color(this.quaternary.bg);
+      let constrast = color.contrast(Color("#fff"));
 
-      if (bgColor.luminosity() < 0.03) {
-        return "white";
+      // If the contrast is not enough with black or white text,
+      // we need to darken/lighten the background color
+      while (constrast < MIN_CONTRAST) {
+        color = color.darken(0.5);
+        constrast = color.contrast(Color("#fff"));
       }
-      if (bgColor.luminosity() > 0.8) {
-        return "black";
-      }
-
-      if (bgColor.isLight()) {
-        console.log('is Light')
-        textColor = this.darkenText(textColor, bgColor);
-      } else {
-        console.log('is Dark')
-        textColor = this.lightenText(textColor, bgColor);
-      }
-
-      return textColor.string();
+      return color;
     }
   },
+
+  watch: {
+    mode() {
+      this.updateColorVariable(
+        "--mode-text-color",
+        this.mode === "dark" ? "#bbbfbd" : "#525458"
+      );
+      this.updateColorVariable(
+        "--mode-bg-color",
+        this.mode === "dark" ? "#1e2125" : "#fff"
+      );
+    }
+  },
+
   methods: {
+    updateColorVariable(colorName, newValue) {
+      document.documentElement.style.setProperty(colorName, newValue);
+    },
+
+    generateTextAndBg(color) {
+      let bg = Color(color);
+      const text = bg.isLight() ? Color("#000") : Color("#fff");
+
+      let constrast = text.contrast(bg);
+
+      // If the contrast is not enough with black or white text,
+      // we need to darken/lighten the background color
+      while (constrast < MIN_CONTRAST) {
+        bg = text.isLight() ? bg.darken(0.5) : bg.lighten(0.5);
+        constrast = text.contrast(bg);
+      }
+      return { text: text.string(), bg: bg.string() };
+    },
+
     selectColorScheme(scheme) {
       this.selectedColorScheme = scheme;
       this.updateColors();
     },
-    updateColorVariable(colorName, newValue) {
-      document.documentElement.style.setProperty(colorName, newValue);
-    },
-    darkenText(color1) {
-      let temp = Color(color1);
-      let contrast = temp.contrast(color1);
 
-      while (contrast < 5 && temp.hex() !== "#FFFFFF" && temp.hex() !== "#000000") {
-        temp = temp.darken(.1);
-        contrast = temp.contrast(color1);
-      }
-      return temp;
-      // if (color1.contrast(color2) > 5) {
-      //   return color1;
-      // }
-      // return color1.darken(5);
-    },
-    lightenText(color1) {
-      let temp = Color(color1);
-      let contrast = temp.contrast(color1);
-
-      while (contrast < 15 && temp.hex() !== "#FFFFFF" && temp.hex() !== "#000000") {
-        temp = temp.lighten(.2);
-        contrast = temp.contrast(color1);
-      }
-      return temp;
-    },
     updateColors() {
-      /* eslint-disable no-inner-declarations */
-      this.updateColorVariable("--primary-bg-color", this.primaryBgColor);
-      //
-      this.updateColorVariable("--primary-text-color", this.primaryTextColor);
-      this.updateColorVariable("--secondary-bg-color", this.secondaryBgColor);
-      this.updateColorVariable("--tertiary-bg-color", this.tertiaryBgColor);
-      this.updateColorVariable("--quaternary-bg-color", this.quaternaryBgColor);
+      // Generate colors
+      this.primary = this.generateTextAndBg(this.mainColor);
+      this.secondary = this.generateTextAndBg(
+        Color(this.mainColor).rotate(this.selectedColorScheme.angles[0])
+      );
+      this.tertiary = this.generateTextAndBg(
+        Color(this.mainColor).rotate(this.selectedColorScheme.angles[1])
+      );
+      this.quaternary = this.generateTextAndBg(
+        Color(this.mainColor).rotate(this.selectedColorScheme.angles[2])
+      );
+
+      // Update CSS variables
+      const colorOptions = ["primary", "secondary", "tertiary", "quaternary"];
+
+      colorOptions.forEach(option => {
+        this.updateColorVariable(`--${option}-text-color`, this[option].text);
+        this.updateColorVariable(`--${option}-bg-color`, this[option].bg);
+      });
+
+      this.updateColorVariable("--link-color", this.linkColor);
     }
   },
-  mounted() {
+  created() {
     this.selectedColorScheme = this.colorSchemes.analogous;
     this.updateColors();
   }
 };
 </script>
 
-
 <style lang="scss">
-  @import './styles/main.scss';
+@import "./styles/main.scss";
 </style>
