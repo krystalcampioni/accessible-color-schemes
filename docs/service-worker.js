@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/accessible-color-schemes/precache-manifest.991104bfa09c79b37c7c2f664a8796b4.js"
+  "/accessible-color-schemes/precache-manifest.6fa0671df4c489ac6bc2b5e4b3ec0845.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "accessible-colour-schemes"});

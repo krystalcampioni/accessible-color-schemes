@@ -43,7 +43,7 @@
     <section class="product-highlights flex-container">
       <div class="product-highlights__card" v-for="n in 3" :key="n">
         <img
-          :src="`/img/product ${n}.png`"
+          :src="`./img/product ${n}.png`"
           alt="black snowboard jacket with fur hood"
         />
         <a href="/snowboard" class="product-highlights__link">
