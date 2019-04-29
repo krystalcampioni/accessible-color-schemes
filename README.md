@@ -4,7 +4,7 @@ This project is a prototype on how to allow the user to select a UI colour schem
 
 > This project is far from perfect, and if you see any areas where it could be improved, feel free to submit a pull request ♥️
 
-You can find the presentation slides for this project [here](https://krystalcampioni.github.io/accessible-color-schemes/slides)
+You can play around with the prototype [here](https://krystalcampioni.github.io/accessible-color-schemes/), and  check the presentation slides for this project [here](https://krystalcampioni.github.io/accessible-color-schemes/slides)
 
 
 
