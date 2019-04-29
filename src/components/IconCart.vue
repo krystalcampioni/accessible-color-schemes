@@ -1,7 +1,7 @@
 <template>
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
     <g fill="none" fill-rule="evenodd" transform="translate(0 -2)">
-      <path d="M0 0h50v50H0z"/>
+      <path d="M0 0h50v50H0z" />
       <circle cx="39" cy="46" r="3" :stroke="color" stroke-width="2" />
       <circle cx="26" cy="46" r="3" :stroke="color" stroke-width="2" />
       <circle cx="2" cy="4" r="2" :fill="color" fill-rule="nonzero" />
